@@ -16,7 +16,7 @@ object MySQL {
 
   def init(): Unit = {
     val driver = "com.mysql.jdbc.Driver"
-    
+
 
     //http://52.89.44.2:9000/
     // make the connection

@@ -78,7 +78,7 @@ object Global extends GlobalSettings {
       )
 
       truckByCuisines.foreach(truck =>
-        MySQL.updateCuisine(truck.cuisine, truck.description, truck.name))
+        MySQL.updateTruck(truck.cuisine, truck.description, truck.name))
 
     }
 
