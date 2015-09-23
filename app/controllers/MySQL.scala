@@ -18,6 +18,7 @@ object MySQL {
     val driver = "com.mysql.jdbc.Driver"
     
 
+    //http://52.89.44.2:9000/
     // make the connection
     Class.forName(driver)
     connection = DriverManager.getConnection(url, username, password)
@@ -84,13 +85,13 @@ object MySQL {
     }
   }
 
-  def updateCuisine(cuisine: String, desc: String, truck_name: String): Either[String, String] = {
+  def updateTruck(cuisine: String, description: String, name: String): Either[String, String] = {
     val func = "insertIntoTable"
     try {
       val stmt = preparedStmt.get("updateCuisine").get
       stmt.setString(1, cuisine)
-      stmt.setString(2, desc)
-      stmt.setString(3, truck_name)
+      stmt.setString(2, description)
+      stmt.setString(3, name)
       stmt.execute()
       Right("Success")
     } catch{

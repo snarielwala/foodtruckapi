@@ -68,7 +68,7 @@ object Global extends GlobalSettings {
 
       Logger.info("Updating Food Truck Data: "+Calendar.getInstance().getTime())
 
-      val cuisines = getByCuisine(links.get("cuisine").get)
+      val truckByCuisines = getByCuisine(links.get("cuisine").get)
       val datas: List[ByDay] = getByDay(links.get("day").get)
       //println(x)
 
@@ -77,8 +77,8 @@ object Global extends GlobalSettings {
         data =>MySQL.insertIntoTable(new Truck(data.name, data.location, data.time, data.day, data.hood, "", "","",""))
       )
 
-      cuisines.foreach(cuisine =>
-        MySQL.updateCuisine(cuisine.cuisine, cuisine.description, cuisine.name))
+      truckByCuisines.foreach(truck =>
+        MySQL.updateCuisine(truck.cuisine, truck.description, truck.name))
 
     }
 
