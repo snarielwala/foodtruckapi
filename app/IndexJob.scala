@@ -14,6 +14,7 @@ import play.api.GlobalSettings
 import play.api.Play.current
 import play.api.libs.concurrent._
 import play.api.libs.concurrent.Execution.Implicits._
+import play.api.libs.ws.WS
 import scala.collection.mutable
 import scala.collection.mutable.ListBuffer
 import scala.concurrent.duration._
@@ -54,8 +55,9 @@ object Global extends GlobalSettings {
 
   override def onStart(app: Application) {
     Logger.info("Food Truck Application Start")
-    MySQL.init()
-    indexFoodTruckData()
+    getLatitudeLongitude("1063 Morse Avenue, Sunnyvale CA")
+    //MySQL.init()
+    //indexFoodTruckData()
 
   }
 
@@ -66,7 +68,7 @@ object Global extends GlobalSettings {
   def indexFoodTruckData() = {
     Akka.system.scheduler.schedule(0 seconds, 1 day) {
 
-      Logger.info("Updating Food Truck Data: "+Calendar.getInstance().getTime())
+      Logger.info("Updating Food Truck Data: " + Calendar.getInstance().getTime())
 
       val truckByCuisines = getByCuisine(links.get("cuisine").get)
       val datas: List[ByDay] = getByDay(links.get("day").get)
@@ -74,13 +76,18 @@ object Global extends GlobalSettings {
 
       MySQL.init()
       datas.foreach(
-        data =>MySQL.insertIntoTable(new Truck(data.name, data.location, data.time, data.day, data.hood, "", "","",""))
+
+        data =>
+          getLatitudeLongitude(data.location)
+          //MySQL.insertIntoTable(new Truck(data.name, data.location, data.time, data.day, data.hood, "", "", "", ""))
+
       )
 
-      truckByCuisines.foreach(truck =>
-        MySQL.updateTruck(truck.cuisine, truck.description, truck.name))
+      //truckByCuisines.foreach(truck =>
+      //MySQL.updateTruck(truck.cuisine, truck.description, truck.name))
 
     }
+  }
 
     def getByCuisine(links: List[String]): List[ByCuisine] = {
       var listByCuisines = new ListBuffer[ByCuisine]
@@ -126,6 +133,15 @@ object Global extends GlobalSettings {
       listByDay.toList
     }
 
+    def getLatitudeLongitude(address: String): (String, String) = {
+      val params = mutable.Seq(("address", address), ("sensor", "false"), ("key", "AIzaSyA5G6j90y934bTJSmwo9AU9oro9Y0mGbAs"))
 
-  }
+      WS.url("https://maps.googleapis.com/maps/api/geocode/json").withQueryString(params: _*).get().map{
+        response =>{val temp = (response.json \ "results" \ "geometry" \ "location").as[String]
+          Logger.info("Response:" + temp)}
+      }
+
+    ("hello","world")
+    }
+
 }
